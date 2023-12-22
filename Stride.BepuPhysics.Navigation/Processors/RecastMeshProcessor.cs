@@ -12,6 +12,7 @@ using Stride.Rendering.Materials;
 using Stride.Core;
 using Stride.Input;
 using Stride.Engine.Processors;
+using Stride.BepuPhysics.Processors;
 
 namespace Stride.BepuPhysics.Navigation.Processors;
 public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComponent>
@@ -57,7 +58,12 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 
 	private void SceneInstance_RootSceneChanged(object? sender, EventArgs e)
 	{
+		_colliderProcessor.BodyShapes.Clear();
 		Dispose();
+		_sceneSystem.SceneInstance.Processors.Add(_colliderProcessor);
+		UpdateMeshData();
+		// This locks the game for a second and needs to be fixed if dynamic navmeshes are to be used.
+		CreateNavMesh();
 	}
 
 	protected override void OnEntityComponentAdding(Entity entity, [NotNull] BepuNavigationBoundingBoxComponent component, [NotNull] BepuNavigationBoundingBoxComponent data)
@@ -198,12 +204,11 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 	protected override void OnSystemRemove()
 	{
 		base.OnSystemRemove();
-
-		_sceneSystem.SceneInstance.Processors.Remove(_colliderProcessor);
+		Dispose();
 	}
 
 	private void Dispose()
 	{
-		_sceneSystem.SceneInstance.Processors.Remove(this);
+		_sceneSystem.SceneInstance.Processors.Remove(_colliderProcessor);
 	}
 }
