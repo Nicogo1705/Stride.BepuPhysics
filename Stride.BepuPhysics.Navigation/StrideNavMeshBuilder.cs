@@ -39,10 +39,10 @@ public class StrideNavMeshBuilder
 		option.maxTiles = GetMaxTiles(geom, cellSize, tileSize);
 		option.maxPolys = GetMaxPolysPerTile(geom, cellSize, tileSize);
 		DtNavMesh navMesh = new DtNavMesh(option, vertsPerPoly);
-		meshData.ForEach(delegate (DtMeshData md)
+		for (int i = 0; i < meshData.Count; i++)
 		{
-			navMesh.AddTile(md, 0, 0L);
-		});
+			navMesh.AddTile(meshData[i], 0, 0L);
+		}
 		return navMesh;
 	}
 
