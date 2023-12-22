@@ -13,6 +13,75 @@ Hierarchy:
         - ref!! 74ad0481-11b5-452c-a193-8e34d677bcda
         - ref!! c352c501-36ae-4812-8f56-51b5abe2ab25
     Parts:
+        -   Folder: null
+            Entity:
+                Id: 01ae3c65-96dd-4f25-8839-d8830d74e9b6
+                Name: TestBox
+                Components:
+                    ee304ecdd8355d6d6fa10a198e263628: !TransformComponent
+                        Id: 91304022-eca2-460e-959b-9b3edce7592c
+                        Position: {X: -19.545986, Y: 12.452974, Z: 28.100586}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 5.0, Y: 5.0, Z: 5.0}
+                        Children: {}
+                    342e8e757e2204a0742df33cceb3d8cb: !Stride.BepuPhysics.Components.Containers.BodyContainerComponent,Stride.BepuPhysics
+                        Id: b47d3534-3f83-426a-8583-c5d9bf347efc
+                        SimulationIndex: 0
+                        SpringFrequency: 30.0
+                        SpringDampingRatio: 3.0
+                        FrictionCoefficient: 1.0
+                        MaximumRecoveryVelocity: 1000.0
+                        ColliderGroupMask: 255
+                        ColliderFilterByDistanceId: 0
+                        ColliderFilterByDistanceX: 0
+                        ColliderFilterByDistanceY: 0
+                        ColliderFilterByDistanceZ: 0
+                        IgnoreGlobalGravity: false
+                        Kinematic: false
+                        SleepThreshold: 0.01
+                        MinimumTimestepCountUnderThreshold: 32
+                    53029207567798e6f5437679cda6ff27: !Stride.BepuPhysics.Components.Colliders.BoxColliderComponent,Stride.BepuPhysics
+                        Id: 3d371ec2-771b-47cd-945e-39f9911e206a
+                        Mass: 1.0
+                        Size: {X: 5.0, Y: 5.0, Z: 5.0}
+                    bc6d5bea3c928e208502900e653df3e4: !ModelComponent
+                        Id: 3647515e-e05a-4f40-8304-51101376d40f
+                        Model: 2e92e632-0dc1-43d1-a917-0fd994f7ac71:Models/CubeModel
+                        Materials: {}
+        -   Entity:
+                Id: 1fa94e82-ca0f-46cd-895c-b523a98a3cef
+                Name: TestBox
+                Components:
+                    ee304ecdd8355d6d6fa10a198e263628: !TransformComponent
+                        Id: ee77e9d7-58bc-4b94-95a3-e839344e84b7
+                        Position: {X: -19.545986, Y: 12.452974, Z: 22.823187}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    342e8e757e2204a0742df33cceb3d8cb: !Stride.BepuPhysics.Components.Containers.BodyContainerComponent,Stride.BepuPhysics
+                        Id: d4179d19-d308-47c3-9e9a-c2afdb6856ad
+                        SimulationIndex: 0
+                        SpringFrequency: 30.0
+                        SpringDampingRatio: 3.0
+                        FrictionCoefficient: 1.0
+                        MaximumRecoveryVelocity: 1000.0
+                        ColliderGroupMask: 255
+                        ColliderFilterByDistanceId: 0
+                        ColliderFilterByDistanceX: 0
+                        ColliderFilterByDistanceY: 0
+                        ColliderFilterByDistanceZ: 0
+                        IgnoreGlobalGravity: false
+                        Kinematic: false
+                        SleepThreshold: 0.01
+                        MinimumTimestepCountUnderThreshold: 32
+                    53029207567798e6f5437679cda6ff27: !Stride.BepuPhysics.Components.Colliders.BoxColliderComponent,Stride.BepuPhysics
+                        Id: fe8f3c82-c573-4ce3-a6e7-4ca25ff09daf
+                        Mass: 1.0
+                        Size: {X: 1.0, Y: 1.0, Z: 1.0}
+                    bc6d5bea3c928e208502900e653df3e4: !ModelComponent
+                        Id: 8b002fd3-935c-4b06-9882-38dcf3880d55
+                        Model: 2e92e632-0dc1-43d1-a917-0fd994f7ac71:Models/CubeModel
+                        Materials: {}
         -   Entity:
                 Id: 3048579d-590d-4cb6-9da2-00d3df6c348c
                 Name: Skybox
@@ -285,6 +354,8 @@ Hierarchy:
                             5a5eb858984c75a278869fe561ffe497: ref!! 923fa071-ae79-4363-a32e-12463ef3357c
                             e477409f51de6f506569fa565fca8495: ref!! 276d6c54-5967-447c-b848-63b055eabf76
                             76be3a32490a441bbf1eb66a9e36a555: ref!! a8a69d8e-9116-44a7-aef6-5c69eecfb7e8
+                            9dff2f3cef03e9d81fb223f60bf6204b: ref!! ee77e9d7-58bc-4b94-95a3-e839344e84b7
+                            d8beeef1155ec3e79adf075509571c1a: ref!! 91304022-eca2-460e-959b-9b3edce7592c
         -   Entity:
                 Id: c3bb90a8-1489-40f9-90cd-95f5518327b6
                 Name: HexOf
