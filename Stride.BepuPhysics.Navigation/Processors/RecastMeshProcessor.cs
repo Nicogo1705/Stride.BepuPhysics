@@ -45,6 +45,13 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 		_sceneSystem.SceneInstance.Processors.Add(_colliderProcessor);
 
 		_scriptSystem = Services.GetSafeServiceAs<ScriptSystem>();
+
+		_sceneSystem.SceneInstance.RootSceneChanged += SceneInstance_RootSceneChanged;
+	}
+
+	private void SceneInstance_RootSceneChanged(object? sender, EventArgs e)
+	{
+		Dispose();
 	}
 
 	protected override void OnEntityComponentAdding(Entity entity, [NotNull] BepuNavigationBoundingBoxComponent component, [NotNull] BepuNavigationBoundingBoxComponent data)
@@ -71,6 +78,11 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 
 	public void CreateNavMesh()
 	{
+		if(Points.Count == 0 || Indices.Count == 0)
+		{
+			return;
+		}
+
 		List<float> verts = new();
 		// dotrecast wants a list of floats, so we need to convert the list of vectors to a list of floats
 		// this may be able to be changed in the StrideGeomProvider class
@@ -174,5 +186,17 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 		{
 			Indices.Add(index + vbase);
 		}
+	}
+
+	protected override void OnSystemRemove()
+	{
+		base.OnSystemRemove();
+
+		_sceneSystem.SceneInstance.Processors.Remove(_colliderProcessor);
+	}
+
+	private void Dispose()
+	{
+		_sceneSystem.SceneInstance.Processors.Remove(this);
 	}
 }
