@@ -12,6 +12,8 @@ Hierarchy:
         - ref!! 3048579d-590d-4cb6-9da2-00d3df6c348c
         - ref!! 74ad0481-11b5-452c-a193-8e34d677bcda
         - ref!! c352c501-36ae-4812-8f56-51b5abe2ab25
+        - ref!! 315585b4-3197-485d-8ea7-43cf53c44437
+        - ref!! a6b90126-188a-4e60-b5a4-26fecb8c93fb
     Parts:
         -   Folder: null
             Entity:
@@ -102,6 +104,23 @@ Hierarchy:
                             Skybox: 798bfa4f-a596-46b7-b94a-b558d4eb1425:Skybox
                         Intensity: 0.1
         -   Entity:
+                Id: 315585b4-3197-485d-8ea7-43cf53c44437
+                Name: NavAgent
+                Components:
+                    20ef2ffbb850bf29ef4df723a42fe114: !TransformComponent
+                        Id: 6189bc76-e16b-4007-b0f8-04aa4ce5a50c
+                        Position: {X: -46.012054, Y: 2.042716, Z: 54.03478}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children:
+                            6497e41ddec5c42e42cca8ab0f7bac32: ref!! 5640a9c2-a7b0-4c27-bf06-8b2b344988a4
+                    c340306e441ed9dff75743907ec4e3d1: !NavAgent
+                        Id: 3e92022b-9c97-4cc1-a7c8-55188a2154e5
+                        IsDirty: true
+                        Target: {X: 0.0, Y: 0.0, Z: 0.0}
+                        PathPointIndex: 0
+                        TestTarget: ref!! a6b90126-188a-4e60-b5a4-26fecb8c93fb
+        -   Entity:
                 Id: 33f10382-7951-47d4-80f0-6a621bca55e4
                 Name: Hex
                 Components:
@@ -169,7 +188,7 @@ Hierarchy:
                 Components:
                     191a9580bfac05d33d042a46b9b519ac: !TransformComponent
                         Id: d007fc7d-4f99-4300-b43d-da9fa72e95f6
-                        Position: {X: 0.0, Y: 20.0, Z: 50.0}
+                        Position: {X: -45.05996, Y: 9.880053, Z: 87.41096}
                         Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
                         Scale: {X: 1.0, Y: 1.0, Z: 1.0}
                         Children: {}
@@ -311,6 +330,34 @@ Hierarchy:
                     a2dce13dfa9042f6daa0341907b83feb: !BepuNavigationBoundingBoxComponent
                         Id: adc3ba80-5865-4f8c-ae76-8aad42fcdc7f
                         Size: {X: 100.0, Y: 50.0, Z: 100.0}
+        -   Entity:
+                Id: a12884e1-2703-43f2-9e36-07cc8e5a903a
+                Name: Capsule
+                Components:
+                    5297e3a535133a88e41bd3817f13b6dc: !TransformComponent
+                        Id: 5640a9c2-a7b0-4c27-bf06-8b2b344988a4
+                        Position: {X: 0.0, Y: 0.0, Z: 0.0}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    a44e628c8fec25166a8f5b4ba7cf823b: !ModelComponent
+                        Id: 8c102fab-0a6b-49c9-b7b1-6dab6a3c0cba
+                        Model: 5f6c40f5-8ae1-4e62-b93f-f9e327248e51:Models/Capsule
+                        Materials: {}
+        -   Entity:
+                Id: a6b90126-188a-4e60-b5a4-26fecb8c93fb
+                Name: NavTarget
+                Components:
+                    58c3c63f15024fb88cc46a25062fba59: !TransformComponent
+                        Id: 3e01cbb1-3b48-4971-bc4e-25291cc7b3ec
+                        Position: {X: -43.781822, Y: 12.034834, Z: 66.82556}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    3af7fa6aa683496e0a57d61a67aec303: !ModelComponent
+                        Id: 7ecf5e58-1da5-4b1e-827b-f0d07c402aad
+                        Model: 65e9d484-84fb-4acd-a87c-f12c2dcf0da2:Models/Cone
+                        Materials: {}
         -   Entity:
                 Id: c1d69305-de4d-4dc5-8414-ae412db81f58
                 Name: Directional light

@@ -4,11 +4,7 @@ using Stride.BepuPhysics.Navigation.Components;
 using Stride.BepuPhysics.Navigation.Extensions;
 using Stride.Core.Mathematics;
 using Stride.Engine;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Stride.Games;
 
 namespace Stride.BepuPhysics.Navigation.Processors;
 public class DotRecastAgentProcessor : EntityProcessor<DotRecastAgent>
@@ -17,11 +13,39 @@ public class DotRecastAgentProcessor : EntityProcessor<DotRecastAgent>
 	public const int MaxSmooth = 2048;
 
 	private DtNavMesh _navMesh;
-	private List<long> polys;
-	private List<RcVec3f> smoothPath;
 	private readonly RcVec3f polyPickExt = new RcVec3f(2, 4, 2);
 
-	public void FindPath(Vector3 start, Vector3 end)
+	private SceneSystem _sceneSystem;
+
+	public DotRecastAgentProcessor()
+	{
+		// this is done to ensure that this processor runs after the BepuPhysicsProcessors
+		Order = 20002;
+	}
+
+	override protected void OnSystemAdd()
+	{
+		base.OnSystemAdd();
+		_sceneSystem = Services.GetService<SceneSystem>();
+		var test = _sceneSystem.SceneInstance.Processors.Get<RecastMeshProcessor>();
+		_navMesh = test.NavMesh;
+	}
+
+	public override void Update(GameTime time)
+	{
+		foreach (var agent in ComponentDatas.Values)
+		{
+			if (agent.ShouldMove)
+			{
+				agent.ShouldMove = false;
+				agent.Path.Clear();
+				agent.Polys.Clear();
+				FindPath(agent.Entity.Transform.Position, agent.Target, ref agent.Polys, ref agent.Path);
+			}
+		}
+	}
+
+	public void FindPath(Vector3 start, Vector3 end, ref List<long> polys, ref List<Vector3> smoothPath)
 	{
 		var queryFilter = new DtQueryDefaultFilter();
 		DtNavMeshQuery query = new DtNavMeshQuery(_navMesh);
@@ -36,7 +60,7 @@ public class DotRecastAgentProcessor : EntityProcessor<DotRecastAgent>
 	}
 
 	public DtStatus FindFollowPath(DtNavMesh navMesh, DtNavMeshQuery navQuery, long startRef, long endRef, RcVec3f startPt, RcVec3f endPt, IDtQueryFilter filter, bool enableRaycast,
-	ref List<long> polys, ref List<RcVec3f> smoothPath)
+	ref List<long> polys, ref List<Vector3> smoothPath)
 	{
 		if (startRef == 0 || endRef == 0)
 		{
@@ -47,7 +71,7 @@ public class DotRecastAgentProcessor : EntityProcessor<DotRecastAgent>
 		}
 
 		polys ??= new List<long>();
-		smoothPath ??= new List<RcVec3f>();
+		smoothPath ??= new List<Vector3>();
 
 		polys.Clear();
 		smoothPath.Clear();
@@ -65,7 +89,7 @@ public class DotRecastAgentProcessor : EntityProcessor<DotRecastAgent>
 		float SLOP = 0.01f;
 
 		smoothPath.Clear();
-		smoothPath.Add(iterPos);
+		smoothPath.Add(iterPos.ToStrideVector());
 		var visited = new List<long>();
 
 		// Move towards target a small advancement at a time until target reached or
@@ -122,7 +146,7 @@ public class DotRecastAgentProcessor : EntityProcessor<DotRecastAgent>
 				iterPos = targetPos;
 				if (smoothPath.Count < MaxSmooth)
 				{
-					smoothPath.Add(iterPos);
+					smoothPath.Add(iterPos.ToStrideVector());
 				}
 
 				break;
@@ -152,11 +176,11 @@ public class DotRecastAgentProcessor : EntityProcessor<DotRecastAgent>
 				{
 					if (smoothPath.Count < MaxSmooth)
 					{
-						smoothPath.Add(startPos);
+						smoothPath.Add(startPos.ToStrideVector());
 						// Hack to make the dotted path not visible during off-mesh connection.
 						if ((smoothPath.Count & 1) != 0)
 						{
-							smoothPath.Add(startPos);
+							smoothPath.Add(startPos.ToStrideVector());
 						}
 					}
 
@@ -170,7 +194,7 @@ public class DotRecastAgentProcessor : EntityProcessor<DotRecastAgent>
 			// Store results.
 			if (smoothPath.Count < MaxSmooth)
 			{
-				smoothPath.Add(iterPos);
+				smoothPath.Add(iterPos.ToStrideVector());
 			}
 		}
 

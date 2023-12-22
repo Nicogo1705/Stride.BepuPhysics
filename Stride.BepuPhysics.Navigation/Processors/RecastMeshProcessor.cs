@@ -20,6 +20,8 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 	public List<Vector3> Points = new List<Vector3>();
 	public List<int> Indices = new List<int>();
 
+	public DtNavMesh? NavMesh => _navMesh;
+
 	private StrideNavMeshBuilder _navMeshBuilder = new();
 	private RcNavMeshBuildSettings _navSettings = new();
 	private DtNavMesh? _navMesh;
@@ -47,6 +49,10 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 		_scriptSystem = Services.GetSafeServiceAs<ScriptSystem>();
 
 		_sceneSystem.SceneInstance.RootSceneChanged += SceneInstance_RootSceneChanged;
+		
+		UpdateMeshData();
+		// This locks the game for a second and needs to be fixed if dynamic navmeshes are to be used.
+		CreateNavMesh();
 	}
 
 	private void SceneInstance_RootSceneChanged(object? sender, EventArgs e)
@@ -68,8 +74,6 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 	{
 		if (_input.IsKeyPressed(Keys.Space))
 		{
-			Points.Clear();
-			Indices.Clear();
 			UpdateMeshData();
 			// This locks the game for a second and needs to be fixed if dynamic navmeshes are to be used.
 			CreateNavMesh();
@@ -166,7 +170,10 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 	/// </summary>
 	private void UpdateMeshData()
 	{
-		foreach(var shape in _colliderProcessor.BodyShapes)
+		Points.Clear();
+		Indices.Clear();
+
+		foreach (var shape in _colliderProcessor.BodyShapes)
 		{
 			AppendArrays(shape.Value.Points, shape.Value.Indices);
 		}

@@ -10,4 +10,9 @@ public static class StrideDotRecastExtensions
 		//return Unsafe.As<RcVec3f, Vector3>(ref vec);
 		return new RcVec3f(vec.X, vec.Y, vec.Z);
 	}
+	public static Vector3 ToStrideVector(this RcVec3f vec)
+	{
+		//return Unsafe.As<RcVec3f, Vector3>(ref vec);
+		return new Vector3(vec.X, vec.Y, vec.Z);
+	}
 }
