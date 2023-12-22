@@ -100,7 +100,6 @@ public class BepuStaticColliderProcessor : EntityProcessor<StaticContainerCompon
 		base.OnSystemRemove();
 
 		BodyShapes.Clear();
-
 	}
 
 }
