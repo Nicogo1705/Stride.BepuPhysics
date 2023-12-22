@@ -34,8 +34,6 @@ public class BepuStaticColliderProcessor : EntityProcessor<StaticContainerCompon
 
 	protected override void OnSystemAdd()
 	{
-		base.OnSystemAdd();
-
 		_sceneSystem = Services.GetService<SceneSystem>();
 		_entityProcessor = _sceneSystem.SceneInstance.GetProcessor<EntityProcessor>();
 		
@@ -56,11 +54,6 @@ public class BepuStaticColliderProcessor : EntityProcessor<StaticContainerCompon
 				}
 			}
 		}
-	}
-
-	protected override StaticContainerComponent GenerateComponentData(Entity entity, StaticContainerComponent component)
-	{
-		return base.GenerateComponentData(entity, component);
 	}
 
 	protected override bool IsAssociatedDataValid(Entity entity, StaticContainerComponent component, StaticContainerComponent associatedData)
@@ -97,8 +90,6 @@ public class BepuStaticColliderProcessor : EntityProcessor<StaticContainerCompon
 
 	protected override void OnSystemRemove()
 	{
-		base.OnSystemRemove();
-
 		BodyShapes.Clear();
 	}
 

@@ -41,7 +41,6 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 
 	protected override void OnSystemAdd()
 	{
-		base.OnSystemAdd();
 		_game = Services.GetService<IGame>();
 		_sceneSystem = Services.GetService<SceneSystem>();
 		_input = Services.GetSafeServiceAs<InputManager>();
@@ -203,7 +202,6 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 
 	protected override void OnSystemRemove()
 	{
-		base.OnSystemRemove();
 		Dispose();
 	}
 

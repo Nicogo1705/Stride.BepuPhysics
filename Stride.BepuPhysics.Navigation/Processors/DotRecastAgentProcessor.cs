@@ -25,7 +25,6 @@ public class DotRecastAgentProcessor : EntityProcessor<DotRecastAgent>
 
 	override protected void OnSystemAdd()
 	{
-		base.OnSystemAdd();
 		_sceneSystem = Services.GetService<SceneSystem>();
 		var test = _sceneSystem.SceneInstance.Processors.Get<RecastMeshProcessor>();
 		_navMesh = test.NavMesh;
