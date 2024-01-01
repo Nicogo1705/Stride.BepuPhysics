@@ -12,6 +12,7 @@ using Stride.Rendering.Materials;
 using Stride.Core;
 using Stride.Input;
 using Stride.Engine.Processors;
+using Stride.BepuPhysics.Processors;
 
 namespace Stride.BepuPhysics.Navigation.Processors;
 public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComponent>
@@ -19,6 +20,8 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 
 	public List<Vector3> Points = new List<Vector3>();
 	public List<int> Indices = new List<int>();
+
+	public DtNavMesh? NavMesh => _navMesh;
 
 	private StrideNavMeshBuilder _navMeshBuilder = new();
 	private RcNavMeshBuildSettings _navSettings = new();
@@ -38,13 +41,28 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 
 	protected override void OnSystemAdd()
 	{
-		base.OnSystemAdd();
 		_game = Services.GetService<IGame>();
 		_sceneSystem = Services.GetService<SceneSystem>();
 		_input = Services.GetSafeServiceAs<InputManager>();
 		_sceneSystem.SceneInstance.Processors.Add(_colliderProcessor);
 
 		_scriptSystem = Services.GetSafeServiceAs<ScriptSystem>();
+
+		_sceneSystem.SceneInstance.RootSceneChanged += SceneInstance_RootSceneChanged;
+		
+		UpdateMeshData();
+		// This locks the game for a second and needs to be fixed if dynamic navmeshes are to be used.
+		CreateNavMesh();
+	}
+
+	private void SceneInstance_RootSceneChanged(object? sender, EventArgs e)
+	{
+		_colliderProcessor.BodyShapes.Clear();
+		Dispose();
+		_sceneSystem.SceneInstance.Processors.Add(_colliderProcessor);
+		UpdateMeshData();
+		// This locks the game for a second and needs to be fixed if dynamic navmeshes are to be used.
+		CreateNavMesh();
 	}
 
 	protected override void OnEntityComponentAdding(Entity entity, [NotNull] BepuNavigationBoundingBoxComponent component, [NotNull] BepuNavigationBoundingBoxComponent data)
@@ -61,8 +79,6 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 	{
 		if (_input.IsKeyPressed(Keys.Space))
 		{
-			Points.Clear();
-			Indices.Clear();
 			UpdateMeshData();
 			// This locks the game for a second and needs to be fixed if dynamic navmeshes are to be used.
 			CreateNavMesh();
@@ -71,6 +87,11 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 
 	public void CreateNavMesh()
 	{
+		if(Points.Count == 0 || Indices.Count == 0)
+		{
+			return;
+		}
+
 		List<float> verts = new();
 		// dotrecast wants a list of floats, so we need to convert the list of vectors to a list of floats
 		// this may be able to be changed in the StrideGeomProvider class
@@ -154,7 +175,10 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 	/// </summary>
 	private void UpdateMeshData()
 	{
-		foreach(var shape in _colliderProcessor.BodyShapes)
+		Points.Clear();
+		Indices.Clear();
+
+		foreach (var shape in _colliderProcessor.BodyShapes)
 		{
 			AppendArrays(shape.Value.Points, shape.Value.Indices);
 		}
@@ -174,5 +198,15 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
 		{
 			Indices.Add(index + vbase);
 		}
+	}
+
+	protected override void OnSystemRemove()
+	{
+		Dispose();
+	}
+
+	private void Dispose()
+	{
+		_sceneSystem.SceneInstance.Processors.Remove(_colliderProcessor);
 	}
 }

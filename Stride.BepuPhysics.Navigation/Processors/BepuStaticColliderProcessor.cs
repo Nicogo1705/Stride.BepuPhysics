@@ -6,6 +6,7 @@ using Stride.Core.Annotations;
 using Stride.Core.Mathematics;
 using Stride.Engine;
 using System.Collections.Generic;
+using System.ComponentModel;
 using static BepuPhysics.Collidables.CompoundBuilder;
 
 namespace Stride.BepuPhysics.Navigation.Processors;
@@ -33,8 +34,6 @@ public class BepuStaticColliderProcessor : EntityProcessor<StaticContainerCompon
 
 	protected override void OnSystemAdd()
 	{
-		base.OnSystemAdd();
-
 		_sceneSystem = Services.GetService<SceneSystem>();
 		_entityProcessor = _sceneSystem.SceneInstance.GetProcessor<EntityProcessor>();
 		
@@ -57,11 +56,6 @@ public class BepuStaticColliderProcessor : EntityProcessor<StaticContainerCompon
 		}
 	}
 
-	protected override StaticContainerComponent GenerateComponentData(Entity entity, StaticContainerComponent component)
-	{
-		return base.GenerateComponentData(entity, component);
-	}
-
 	protected override bool IsAssociatedDataValid(Entity entity, StaticContainerComponent component, StaticContainerComponent associatedData)
 	{
 		// need to check for both StaticColliderComponent and StaticMeshContainerComponent
@@ -78,6 +72,12 @@ public class BepuStaticColliderProcessor : EntityProcessor<StaticContainerCompon
 		foreach(var shape in data.GetShapeData())
 		{
 			BodyShapes.TryAdd(data, shape);
+			// transform the points to world space
+			for (int i = 0; i < shape.Points.Count; i++)
+			{
+				shape.Points[i] = Vector3.Transform(shape.Points[i], component.Orientation);
+				shape.Points[i] = (shape.Points[i] + component.Entity.Transform.WorldMatrix.TranslationVector) + component.CenterOfMass;
+			}
 		}
 		ColliderAdded?.Invoke(data);
 	}
@@ -86,6 +86,11 @@ public class BepuStaticColliderProcessor : EntityProcessor<StaticContainerCompon
 	{
 		BodyShapes.Remove(data);
 		ColliderRemoved?.Invoke(data);
+	}
+
+	protected override void OnSystemRemove()
+	{
+		BodyShapes.Clear();
 	}
 
 }
