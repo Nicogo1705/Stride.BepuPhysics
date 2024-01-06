@@ -58,7 +58,6 @@ namespace Stride.BepuPhysics.DebugRender.Processors
         {
             _alwaysOn = component.AlwaysRender;
             component.SetFunc = (e) => _alwaysOn = e;
-            base.OnEntityComponentAdding(entity, component, data);
         }
 
         public override void Update(GameTime time)
@@ -72,8 +71,6 @@ namespace Stride.BepuPhysics.DebugRender.Processors
                 UpdateRender();
             if (!EnableWireframe)
                 Clear();
-
-            base.Update(time);
         }
 
         private void UpdateRender()
