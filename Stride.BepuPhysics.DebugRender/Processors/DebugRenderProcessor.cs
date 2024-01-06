@@ -16,6 +16,8 @@ namespace Stride.BepuPhysics.DebugRender.Processors
 {
     public class DebugRenderProcessor : EntityProcessor<DebugRenderComponent>
     {
+        public bool EnableWireframe { get; set; } = true;
+
         private IGame? _game = null;
         private SceneSystem _sceneSystem;
         private BepuShapeCacheSystem _bepuShapeCacheSystem;
@@ -61,9 +63,14 @@ namespace Stride.BepuPhysics.DebugRender.Processors
 
         public override void Update(GameTime time)
         {
-            if (_alwaysOn || _input.IsKeyDown(Keys.F10))
+			if(_input.IsKeyPressed(Keys.F10))
+            {
+                EnableWireframe = !EnableWireframe;
+            }
+
+			if (_alwaysOn || EnableWireframe)
                 UpdateRender();
-            if (_input.IsKeyDown(Keys.F11))
+            if (!EnableWireframe)
                 Clear();
 
             base.Update(time);
