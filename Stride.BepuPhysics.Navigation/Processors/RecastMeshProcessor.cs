@@ -12,6 +12,12 @@ using Stride.Engine;
 using Stride.Games;
 using Stride.Core;
 using Stride.Input;
+using Stride.Rendering;
+using System.Xml.Linq;
+using Stride.Graphics;
+using Stride.Rendering.Materials.ComputeColors;
+using Stride.Rendering.Materials;
+using Stride.Core.Mathematics;
 
 namespace Stride.BepuPhysics.Navigation.Processors;
 public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComponent>
@@ -24,8 +30,9 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
     private BepuStaticColliderProcessor _colliderProcessor = new();
     private CancellationTokenSource _rebuildingTask = new();
     private Task<DtNavMesh>? _runningRebuild;
+	private IGame _game;
 
-    public RecastMeshProcessor()
+	public RecastMeshProcessor()
     {
         // this is done to ensure that this processor runs after the BepuPhysicsProcessors
         Order = 20000;
@@ -37,7 +44,8 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
         _sceneSystem = Services.GetService<SceneSystem>();
         _input = Services.GetSafeServiceAs<InputManager>();
         _sceneSystem.SceneInstance.Processors.Add(_colliderProcessor);
-    }
+		_game = Services.GetService<IGame>();
+	}
 
     protected override void OnEntityComponentAdding(Entity entity, [NotNull] BepuNavigationBoundingBoxComponent component, [NotNull] BepuNavigationBoundingBoxComponent data)
     {
@@ -55,7 +63,19 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
         {
             _navMesh = _runningRebuild.Result;
             _runningRebuild = null;
-        }
+
+			List<Vector3> strideVerts = new List<Vector3>();
+			for (int i = 0; i < _navMesh.GetTileCount(); i++)
+			{
+				for (int j = 0; j < _navMesh.GetTile(i).data.verts.Count();)
+				{
+					strideVerts.Add(
+						new Vector3(_navMesh.GetTile(i).data.verts[j++], _navMesh.GetTile(i).data.verts[j++], _navMesh.GetTile(i).data.verts[j++])
+						);
+				}
+			}
+			SpawPrefabAtVerts(strideVerts);
+		}
 
 #warning Remove debug logic
         if (_input.IsKeyPressed(Keys.Space))
@@ -75,17 +95,20 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
         // Something we'll have to investigate later.
         var points = new List<VertexPosition3>();
         var indices = new List<int>();
-        foreach (var shape in _colliderProcessor.BodyShapes)
+        foreach (var shapes in _colliderProcessor.Colliders.Values)
         {
-            // Copy vertices
-            int vBase = points.Count;
-            points.AddRange(shape.Value.Vertices);
-
-            // Copy indices with offset applied
-            indices.Capacity += shape.Value.Indices.Length;
-            foreach (int index in shape.Value.Indices)
+            foreach (var shape in shapes)
             {
-                indices.Add(index + vBase);
+                // Copy vertices
+                int vBase = points.Count;
+                points.AddRange(shape.Vertices);
+
+                // Copy indices with offset applied
+                indices.Capacity += shape.Indices.Length;
+                foreach (int index in shape.Indices)
+                {
+                    indices.Add(index + vBase);
+                }
             }
         }
 
@@ -187,7 +210,7 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
             navMesh.AddTile(dtMeshData1, 0, 0L);
         }
 
-        cancelToken.ThrowIfCancellationRequested();
+		cancelToken.ThrowIfCancellationRequested();
 
         return navMesh;
     }
@@ -218,5 +241,44 @@ public class RecastMeshProcessor : EntityProcessor<BepuNavigationBoundingBoxComp
         int num = (sizeX + tileSize - 1) / tileSize;
         int num2 = (sizeZ + tileSize - 1) / tileSize;
         return [num, num2];
+    }
+
+    private void SpawPrefabAtVerts(List<Vector3> verts)
+    {
+        // Make sure the cube is a root asset or else this wont load
+        var cube = _game.Content.Load<Model>("Cube");
+        foreach (var vert in verts)
+        {
+            AddMesh(_game.GraphicsDevice, _sceneSystem.SceneInstance.RootScene, vert, cube.Meshes[0].Draw);
+        }
+    }
+    // TODO: this is just me debugging should remove later
+    Entity AddMesh(GraphicsDevice graphicsDevice, Scene rootScene, Vector3 position, MeshDraw meshDraw)
+    {
+        var entity = new Entity { Scene = rootScene, Transform = { Position = position } };
+        var model = new Model
+        {
+        new MaterialInstance
+        {
+            Material = Material.New(graphicsDevice, new MaterialDescriptor
+            {
+                Attributes = new MaterialAttributes
+                {
+                    DiffuseModel = new MaterialDiffuseLambertModelFeature(),
+                    Diffuse = new MaterialDiffuseMapFeature
+                    {
+                        DiffuseMap = new ComputeVertexStreamColor()
+                    },
+                }
+            })
+        },
+        new Mesh
+        {
+            Draw = meshDraw,
+            MaterialIndex = 0
+        }
+        };
+        entity.Add(new ModelComponent { Model = model });
+        return entity;
     }
 }
