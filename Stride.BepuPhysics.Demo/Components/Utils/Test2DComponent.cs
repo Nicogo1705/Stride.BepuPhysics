@@ -7,7 +7,6 @@ using Stride.Rendering;
 using Stride.Rendering.ProceduralModels;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Stride.BepuPhysics.Demo.Components.Utils;
 
@@ -52,7 +51,7 @@ public class Test2DComponent : SyncScript
 
             //SetCubeCount(scene);
         }
-        else if (Input.IsKeyPressed(Keys.R))
+        else if (Input.IsKeyPressed(Keys.H))
         {
             Add2DShapes(Primitive2DModelType.Rectangle, _spawnCount);
 
@@ -76,18 +75,18 @@ public class Test2DComponent : SyncScript
 
             //SetCubeCount(scene);
         }
-        else if (Input.IsKeyReleased(Keys.X))
-        {
-            foreach (var entity in Entity.Scene.Entities.SelectMany(s => s.GetChildren()).Where(w => w.Name == ShapeName || w.Name == "Cube").ToList())
-            {
-                entity.Scene = null;
-            }
+        //else if (Input.IsKeyReleased(Keys.X))
+        //{
+        //    foreach (var entity in Entity.Scene.Entities.SelectMany(s => s.GetChildren()).Where(w => w.Name == ShapeName).ToList())
+        //    {
+        //        entity.Scene = null;
+        //    }
 
-            foreach (var entity in Entity.Scene.Entities.Where(w => w.Name == ShapeName || w.Name == "Cube").ToList())
-            {
-                entity.Scene = null;
-            }
-        }
+        //    foreach (var entity in Entity.Scene.Entities.Where(w => w.Name == ShapeName).ToList())
+        //    {
+        //        entity.Scene = null;
+        //    }
+        //}
     }
 
     void ProcessRaycast(MouseButton mouseButton, Vector2 screenPosition)
