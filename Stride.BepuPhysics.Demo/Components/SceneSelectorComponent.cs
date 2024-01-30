@@ -1,4 +1,4 @@
-﻿using Stride.Core.Serialization;
+using Stride.Core.Serialization;
 using Stride.Engine;
 using Stride.Input;
 
@@ -41,7 +41,7 @@ namespace Stride.BepuPhysics.Demo.Components
         }
         public override void Update()
         {
-            DebugText.Print("USE NUMPAD number : (Hold 'n' for more)", new(800, 10));
+            DebugText.Print("USE NUMPAD number : (Hold 'n' for more)", new(1100, 80));
             var shift = Input.IsKeyDown(Keys.N);
 
             for (int i = 0; i < 10; i++)

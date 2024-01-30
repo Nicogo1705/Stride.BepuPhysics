@@ -60,6 +60,8 @@ Hierarchy:
                         KeyboardRotationSpeed: {X: 5.0, Y: 5.0}
                         MouseRotationSpeed: {X: 1.0, Y: 1.0}
                         TouchRotationSpeed: {X: 1.0, Y: 0.7}
+                    2132bfb47731104f53537f1639d0a567: !Stride.BepuPhysics.Demo.Components.Utils.Test2DComponent,Stride.BepuPhysics.Demo
+                        Id: fd2bdb31-d31e-4372-b816-1d08d153beb8
         -   Entity:
                 Id: 289e8db6-044e-4613-87a6-691054648501
                 Name: Floor
