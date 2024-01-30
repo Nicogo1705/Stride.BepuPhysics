@@ -1,9 +1,12 @@
 using Stride.BepuPhysics.Definitions.Colliders;
 using Stride.Core.Mathematics;
 using Stride.Engine;
+using Stride.Games;
 using Stride.Graphics;
 using Stride.Input;
 using Stride.Rendering;
+using Stride.Rendering.Materials;
+using Stride.Rendering.Materials.ComputeColors;
 using Stride.Rendering.ProceduralModels;
 using System;
 using System.Collections.Generic;
@@ -19,11 +22,12 @@ public class Test2DComponent : SyncScript
     private BepuConfiguration? _bepuConfig;
     private CameraComponent? _camera;
     private int _debugX = 5;
-    private int _debugY = 30;
-    private int _spawnCount = 30;
+    private int _debugY = 300;
+    private int _spawnCount = 10;
     private Vector3 _boxSize = new(0.2f, 0.2f, Depth);
     private Vector3 _rectangleSize = new(0.2f, 0.3f, Depth);
     private List<Shape2DModel> _shapes = [];
+
     public override void Start()
     {
         _bepuConfig = Game.Services.GetService<BepuConfiguration>();
@@ -45,31 +49,31 @@ public class Test2DComponent : SyncScript
             ProcessRaycast(MouseButton.Left, Input.MousePosition);
         }
 
-        if (Input.IsKeyPressed(Keys.M))
+        if (Input.IsKeyDown(Keys.J))
         {
             Add2DShapes(Primitive2DModelType.Square, _spawnCount);
 
             //SetCubeCount(scene);
         }
-        else if (Input.IsKeyPressed(Keys.H))
+        else if (Input.IsKeyDown(Keys.H))
         {
             Add2DShapes(Primitive2DModelType.Rectangle, _spawnCount);
 
             //SetCubeCount(scene);
         }
-        else if (Input.IsKeyPressed(Keys.C))
+        else if (Input.IsKeyDown(Keys.C))
         {
             Add2DShapes(Primitive2DModelType.Circle, _spawnCount);
 
             //SetCubeCount(scene);
         }
-        else if (Input.IsKeyPressed(Keys.Y))
+        else if (Input.IsKeyDown(Keys.Y))
         {
             Add2DShapes(Primitive2DModelType.Triangle, _spawnCount);
 
             //SetCubeCount(scene);
         }
-        else if (Input.IsKeyPressed(Keys.P))
+        else if (Input.IsKeyDown(Keys.I))
         {
             Add2DShapes(count: 30);
 
@@ -87,6 +91,26 @@ public class Test2DComponent : SyncScript
         //        entity.Scene = null;
         //    }
         //}
+
+        RenderNavigation();
+
+    }
+
+    void RenderNavigation()
+    {
+        var space = 0;
+        space += 20;
+        DebugText.Print($"J - Generate 2D squares", new Int2(x: _debugX, y: _debugY + space));
+        space += 20;
+        DebugText.Print($"H - Generate 2D rectangles", new Int2(x: _debugX, y: _debugY + space));
+        space += 20;
+        DebugText.Print($"C - Generate 2D circles", new Int2(x: _debugX, y: _debugY + space));
+        space += 20;
+        DebugText.Print($"Y - Generate 2D triangles", new Int2(x: _debugX, y: _debugY + space));
+        space += 20;
+        DebugText.Print($"I - Generate random 2D shapes", new Int2(x: _debugX, y: _debugY + space));
+        space += 20;
+        DebugText.Print($"Mouse click (optionally hold) - Add impulse", new Int2(x: _debugX, y: _debugY + space));
     }
 
     void ProcessRaycast(MouseButton mouseButton, Vector2 screenPosition)
@@ -124,7 +148,7 @@ public class Test2DComponent : SyncScript
 
                     if (hitInfo.Container.Entity.Name == ShapeName)
                     {
-                        DebugText.Print($"Hit! Distance : {hitInfo.Distance}  |  normal : {hitInfo.Normal}  |  Entity : {hitInfo.Container.Entity}", new Int2(x: _debugX, y: 200 + space));
+                        DebugText.Print($"Hit! Distance : {hitInfo.Distance}  |  normal : {hitInfo.Normal}  |  Entity : {hitInfo.Container.Entity}", new Int2(x: _debugX, y: 450 + space));
 
                         space += 20;
 
@@ -141,7 +165,7 @@ public class Test2DComponent : SyncScript
             }
             else
             {
-                DebugText.Print("No raycast hit", new Int2(x: _debugX, y: 200));
+                DebugText.Print("No raycast hit", new Int2(x: _debugX, y: 450));
             }
         }
     }
@@ -160,7 +184,7 @@ public class Test2DComponent : SyncScript
                 new()
                 {
                     Size = shapeModel.Size,
-                    //Material = game.CreateMaterial(shapeModel.Color)
+                    Material = CreateMaterial(Game, shapeModel.Color)
                 });
 
             //if (type == null || i == 1)
@@ -247,7 +271,7 @@ public class Test2DComponent : SyncScript
 
             //compoundCollier.Colliders.Add(collider2);
 
-            // Or you can use just his
+            // Or you can use just his for MeshCollider
             options.Component.Collider = new MeshCollider() { Model = model, Closed = true };
 
             entity.Add(options.Component);
@@ -299,6 +323,23 @@ public class Test2DComponent : SyncScript
             //Primitive2DModelType.Triangle => triangleCollider ?? new TriangleCollider(),
             _ => throw new InvalidOperationException(),
         };
+    }
+
+    public static Material CreateMaterial(IGame game, Color color, float specular = 1.0f, float microSurface = 0.65f)
+    {
+        var materialDescription = new MaterialDescriptor
+        {
+            Attributes =
+                {
+                    Diffuse = new MaterialDiffuseMapFeature(new ComputeColor(color)),
+                    DiffuseModel = new MaterialDiffuseLambertModelFeature(),
+                    Specular =  new MaterialMetalnessMapFeature(new ComputeFloat(specular)),
+                    SpecularModel = new MaterialSpecularMicrofacetModelFeature(),
+                    MicroSurface = new MaterialGlossinessMapFeature(new ComputeFloat(microSurface))
+                }
+        };
+
+        return Material.New(game.GraphicsDevice, materialDescription);
     }
 }
 
