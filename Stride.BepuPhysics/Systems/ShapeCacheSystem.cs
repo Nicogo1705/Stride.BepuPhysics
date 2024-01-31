@@ -14,7 +14,7 @@ using Mesh = BepuPhysics.Collidables.Mesh;
 
 namespace Stride.BepuPhysics.Systems;
 
-internal class ShapeCacheSystem
+public class ShapeCacheSystem
 {
     private IGame _game;
 
