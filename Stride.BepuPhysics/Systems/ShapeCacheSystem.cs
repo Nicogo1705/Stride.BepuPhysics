@@ -174,7 +174,7 @@ internal class ShapeCacheSystem
         int totalIndices = 0;
         foreach (var meshData in model.Meshes)
         {
-            if (meshData.Draw.PrimitiveType == PrimitiveType.TriangleList)
+            if (meshData.Draw.PrimitiveType == PrimitiveType.TriangleList && meshData.Draw.IndexBuffer == null)
             {
                 totalIndices += meshData.Draw.VertexBuffers[0].Count;
             }
@@ -196,7 +196,7 @@ internal class ShapeCacheSystem
             var position = vBindings.Declaration.EnumerateWithOffsets().First(x => x.VertexElement.SemanticName == VertexElementUsage.Position);
             fixed (byte* vBuffer = &verticesBytes[vBindings.Offset])
             {
-                if (meshData.Draw.PrimitiveType == PrimitiveType.TriangleList)
+                if (meshData.Draw.PrimitiveType == PrimitiveType.TriangleList && meshData.Draw.IndexBuffer == null)
                 {
                     for (int i = 0; i < triangles.Length; i++)
                     {
