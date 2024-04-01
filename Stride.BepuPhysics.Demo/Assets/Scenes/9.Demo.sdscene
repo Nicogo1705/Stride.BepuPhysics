@@ -214,7 +214,7 @@ Hierarchy:
                 Components:
                     71846c7436b43b677c35e91ff0eeca48: !TransformComponent
                         Id: da6adf04-eb63-47c1-b089-9519aee44e8c
-                        Position: {X: 0.0, Y: 25.0, Z: 0.0}
+                        Position: {X: 0.0, Y: 100.0, Z: 0.0}
                         Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
                         Scale: {X: 1.0, Y: 1.0, Z: 1.0}
                         Children: {}
@@ -267,7 +267,7 @@ Hierarchy:
                             c4be3cde9267c1a84ebd34fce78c8e1e: ref!! fdb4eab0-70be-4b54-9eab-de347caed944
                             2de7129a3af3a0a764eb2962d5236ecb: ref!! 89d9ebd9-70c2-4b77-8e09-db6c6a98308d
                     46d3e0466c59e94eb920dcace9871a76: !Stride.BepuPhysics.Constraints.HingeConstraintComponent,Stride.BepuPhysics
-                        Id: 2b47c5cf-ae33-4e7c-ad38-931d81433ba5
+                        Id: 3cfd1894-6a96-4dac-a81b-1cb3d5592986
                         Enabled: true
                         A: ref!! b9ffe6bf-b37b-41f7-ad06-f9fda610e08c
                         B: ref!! befd947e-d1a5-4a14-9423-d272129d4ae5
@@ -278,10 +278,10 @@ Hierarchy:
                         SpringFrequency: 30.0
                         SpringDampingRatio: 3.0
                     82adb9d9847f9eab8cefae5aa42e7be3: !Stride.BepuPhysics.Constraints.OneBodyAngularMotorConstraintComponent,Stride.BepuPhysics
-                        Id: 1aeadfc1-ce36-43e7-b0b9-af74a1edc156
+                        Id: 58e7f867-fc96-41c2-b8e7-34892fa61ccf
                         Enabled: true
                         A: ref!! b9ffe6bf-b37b-41f7-ad06-f9fda610e08c
-                        TargetVelocity: {X: 0.0, Y: 0.5, Z: 0.0}
+                        TargetVelocity: {X: 0.0, Y: 2.0, Z: 0.0}
                         MotorDamping: 100.0
                         MotorMaximumForce: 10000000.0
         -   Entity:
@@ -424,9 +424,10 @@ Hierarchy:
                         Instancing: ref!! 07d89da4-4f97-41b4-a347-7eeb9c895d5f
                         SpawnPosition: ref!! 6ff0c913-081a-44cf-ae47-b31d76a53e32
                         Count: 200000
-                        SpawnRate: 500.0
-                        SpawnVelocity: {X: 0.0, Y: 20.0, Z: 0.0}
-                        SpawnVelocityRange: {X: 2.0, Y: 0.0, Z: 2.0}
+                        SpawnRate: 25.0
+                        SpawnVelocity: {X: 0.0, Y: -50.0, Z: 0.0}
+                        SpawnVelocityRange: {X: 5.0, Y: 0.0, Z: 5.0}
+                        RandomPositionRange: {X: 25.0, Y: 0.0, Z: 25.0}
         -   Entity:
                 Id: d51ec2d9-d4bd-406c-82a8-5e7c8762f88c
                 Name: ConeG

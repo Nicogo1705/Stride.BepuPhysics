@@ -80,6 +80,14 @@ public class MeshCollider : ICollider
     {
         Debug.Assert(_container is not null);
 
+        if (Model == null)
+        {
+            index = new();
+            centerOfMass = new();
+            inertia = new();
+            return false;
+        }
+
         shapeCache.GetModelCache(Model, out _cache);
         var mesh = _cache.GetBepuMesh(ComputeMeshScale(_container));
 

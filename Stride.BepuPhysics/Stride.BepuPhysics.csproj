@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -15,7 +14,6 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="..\LICENSE">
       <Pack>True</Pack>
@@ -26,15 +24,10 @@
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="BepuPhysics" Version="2.5.0-beta.19" />
-    <PackageReference Include="Stride.Engine" Version="4.2.0.2067" />
-    <PackageReference Include="Stride.Physics" Version="4.2.0.2067" /><!--For precomputed hulls-->
-
+    <PackageReference Include="Stride.Engine" Version="4.2.0.2122" />
+    <PackageReference Include="Stride.Physics" Version="4.2.0.2122" />
+    <!--For precomputed hulls-->
   </ItemGroup>
-
-
-
-
 </Project>

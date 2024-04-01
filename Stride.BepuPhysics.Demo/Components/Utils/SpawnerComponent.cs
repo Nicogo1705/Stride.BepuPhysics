@@ -16,6 +16,7 @@ namespace Stride.BepuPhysics.Demo.Components.Utils
 
         public Vector3 SpawnVelocity { get; set; } = new(0f, 20f, 0f); //the base velocity of the spawned prefab
         public Vector3 SpawnVelocityRange { get; set; } = new(2f, 0f, 2f); //XYZ * rand[-1,1]
+        public Vector3 RandomPositionRange { get; set; } = new(2f, 2f, 2f); //XYZ * rand[-1,1]
 
 
         private int currentCount = 0;
@@ -45,7 +46,7 @@ namespace Stride.BepuPhysics.Demo.Components.Utils
                 for (int i = 0; i < toSpawn && currentCount < Count; i++)
                 {
                     var vel = SpawnVelocity + new Vector3(minus1to1() * SpawnVelocityRange.X, minus1to1() * SpawnVelocityRange.Y, minus1to1() * SpawnVelocityRange.Z);
-                    Spawn(SpawnPosition.Transform.Position, vel, new());
+                    Spawn(SpawnPosition.Transform.Position +  new Vector3(minus1to1() * RandomPositionRange.X, minus1to1() * RandomPositionRange.Y, minus1to1() * RandomPositionRange.Z), vel, new());
                     currentCount++;
                 }
             }

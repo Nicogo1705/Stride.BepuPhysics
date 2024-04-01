@@ -35,6 +35,7 @@ namespace Stride.BepuPhysics.Demo.Components
 
         public override void Start()
         {
+            DebugText.Visible = true;
             Game.Window.AllowUserResizing = true;
             //Game.Window.IsFullscreen = true;
             Game.Window.Title = "Stride and Bepu Physics V2";

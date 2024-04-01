@@ -77,7 +77,7 @@ internal class ShapeCacheSystem
     }
     internal BasicMeshBuffers BuildTriangle(TriangleCollider tri)
     {
-        return new() { Vertices = new VertexPosition3[] { new(tri.A), new(tri.B), new(tri.C) }, Indices = new[]{0, 1, 2} };
+        return new() { Vertices = new VertexPosition3[] { new(tri.A), new(tri.B), new(tri.C) }, Indices = new[] { 0, 1, 2 } };
     }
 
     public BasicMeshBuffers BorrowHull(ConvexHullCollider convex)
@@ -169,10 +169,19 @@ internal class ShapeCacheSystem
 
     internal static unsafe BepuUtilities.Memory.Buffer<Triangle> ExtractBepuMesh(Model model, IGame game, BufferPool pool)
     {
+#warning we probably don't handle all PrimitiveTypes.
+
         int totalIndices = 0;
         foreach (var meshData in model.Meshes)
         {
-            totalIndices += meshData.Draw.IndexBuffer.Count;
+            if (meshData.Draw.PrimitiveType == PrimitiveType.TriangleList)
+            {
+                totalIndices += meshData.Draw.VertexBuffers[0].Count;
+            }
+            else
+            {
+                totalIndices += meshData.Draw.IndexBuffer.Count;
+            }
         }
 
         pool.Take<Triangle>(totalIndices / 3, out var triangles);
@@ -181,32 +190,45 @@ internal class ShapeCacheSystem
 
         foreach (var meshData in model.Meshes)
         {
-            // Get mesh data from GPU or shared memory, this can be quite slow
             byte[] verticesBytes = meshData.Draw.VertexBuffers[0].Buffer.GetData<byte>(game.GraphicsContext.CommandList);
-            byte[] indicesBytes = meshData.Draw.IndexBuffer.Buffer.GetData<byte>(game.GraphicsContext.CommandList);
-
             var vBindings = meshData.Draw.VertexBuffers[0];
             int vStride = vBindings.Declaration.VertexStride;
             var position = vBindings.Declaration.EnumerateWithOffsets().First(x => x.VertexElement.SemanticName == VertexElementUsage.Position);
-
-            if (position.VertexElement.Format is PixelFormat.R32G32B32_Float or PixelFormat.R32G32B32A32_Float == false)
-                throw new ArgumentException($"{model}'s vertex position must be declared as float3 or float4");
-
             fixed (byte* vBuffer = &verticesBytes[vBindings.Offset])
-            fixed (byte* iBuffer = indicesBytes)
             {
-                if (meshData.Draw.IndexBuffer.Is32Bit)
+                if (meshData.Draw.PrimitiveType == PrimitiveType.TriangleList)
                 {
-                    foreach (int i in new Span<int>(iBuffer + meshData.Draw.IndexBuffer.Offset, meshData.Draw.IndexBuffer.Count))
+                    for (int i = 0; i < triangles.Length; i++)
                     {
                         triangleAsV3[triangleV3Index++] = *(Vector3*)(vBuffer + vStride * i + position.Offset); // start of the buffer, move to the 'i'th vertex, and read from the position field of that vertex
                     }
                 }
                 else
                 {
-                    foreach (ushort i in new Span<ushort>(iBuffer + meshData.Draw.IndexBuffer.Offset, meshData.Draw.IndexBuffer.Count))
+                    // Get mesh data from GPU or shared memory, this can be quite slow
+                    byte[] indicesBytes = meshData.Draw.IndexBuffer.Buffer.GetData<byte>(game.GraphicsContext.CommandList);
+
+
+
+                    if (position.VertexElement.Format is PixelFormat.R32G32B32_Float or PixelFormat.R32G32B32A32_Float == false)
+                        throw new ArgumentException($"{model}'s vertex position must be declared as float3 or float4");
+
+                    fixed (byte* iBuffer = indicesBytes)
                     {
-                        triangleAsV3[triangleV3Index++] = *(Vector3*)(vBuffer + vStride * i + position.Offset);
+                        if (meshData.Draw.IndexBuffer.Is32Bit)
+                        {
+                            foreach (int i in new Span<int>(iBuffer + meshData.Draw.IndexBuffer.Offset, meshData.Draw.IndexBuffer.Count))
+                            {
+                                triangleAsV3[triangleV3Index++] = *(Vector3*)(vBuffer + vStride * i + position.Offset); // start of the buffer, move to the 'i'th vertex, and read from the position field of that vertex
+                            }
+                        }
+                        else
+                        {
+                            foreach (ushort i in new Span<ushort>(iBuffer + meshData.Draw.IndexBuffer.Offset, meshData.Draw.IndexBuffer.Count))
+                            {
+                                triangleAsV3[triangleV3Index++] = *(Vector3*)(vBuffer + vStride * i + position.Offset);
+                            }
+                        }
                     }
                 }
             }
@@ -217,11 +239,18 @@ internal class ShapeCacheSystem
 
     private static unsafe void ExtractMeshBuffers(Model model, Graphics.CommandList commandList, out VertexPosition3[] vertices, out int[] indices)
     {
+#warning we probably don't handle all PrimitiveTypes.
         int totalVertices = 0, totalIndices = 0;
         foreach (var meshData in model.Meshes)
         {
-            totalVertices += meshData.Draw.VertexBuffers[0].Count;
-            totalIndices += meshData.Draw.IndexBuffer.Count;
+            if (meshData.Draw.PrimitiveType == PrimitiveType.TriangleList)
+            {
+                totalVertices += meshData.Draw.VertexBuffers[0].Count;
+            }
+            else
+            {
+                totalIndices += meshData.Draw.IndexBuffer.Count;
+            }
         }
 
         vertices = new VertexPosition3[totalVertices];
@@ -232,52 +261,74 @@ internal class ShapeCacheSystem
         foreach (var meshData in model.Meshes)
         {
             var vBuffer = meshData.Draw.VertexBuffers[0].Buffer;
-            var iBuffer = meshData.Draw.IndexBuffer.Buffer;
             byte[] verticesBytes = vBuffer.GetData<byte>(commandList);
-            byte[] indicesBytes = iBuffer.GetData<byte>(commandList);
 
-            if (verticesBytes == null || indicesBytes == null)
-                throw new InvalidOperationException($"Could not extract data from gpu for '{model}', maybe this model isn't uploaded to the gpu yet ?");
-
-            if (verticesBytes.Length == 0 || indicesBytes.Length == 0)
+            if (meshData.Draw.PrimitiveType == PrimitiveType.TriangleList)
             {
-                vertices = Array.Empty<VertexPosition3>();
-                indices = Array.Empty<int>();
-                return;
-            }
-
-            int vertMappingStart = vertexWriteHead;
-            fixed (byte* bytePtr = verticesBytes)
-            {
-                var vBindings = meshData.Draw.VertexBuffers[0];
-                int count = vBindings.Count;
-                int stride = vBindings.Declaration.VertexStride;
-
-                for (int i = 0, vHead = vBindings.Offset; i < count; i++, vHead += stride)
+                int vertMappingStart = vertexWriteHead;
+                fixed (byte* bytePtr = verticesBytes)
                 {
-                    vertices[vertexWriteHead++].Position = *(Vector3*)(bytePtr + vHead);
-                }
-            }
+                    var vBindings = meshData.Draw.VertexBuffers[0];
+                    int count = vBindings.Count;
+                    int stride = vBindings.Declaration.VertexStride;
 
-            fixed (byte* bytePtr = indicesBytes)
-            {
-                var count = meshData.Draw.IndexBuffer.Count;
-
-                if (meshData.Draw.IndexBuffer.Is32Bit)
-                {
-                    foreach (int indexBufferValue in new Span<int>(bytePtr + meshData.Draw.IndexBuffer.Offset, count))
+                    for (int i = 0, vHead = vBindings.Offset; i < count; i++, vHead += stride)
                     {
-                        indices[indexWriteHead++] = vertMappingStart + indexBufferValue;
+                        vertices[vertexWriteHead++].Position = *(Vector3*)(bytePtr + vHead);
+                    }
+                } 
+                indices = Enumerable.Range(0, totalVertices / 3).ToArray();
+            }
+            else
+            {
+                var iBuffer = meshData.Draw.IndexBuffer.Buffer;
+                byte[] indicesBytes = iBuffer.GetData<byte>(commandList);
+
+                if (verticesBytes == null || indicesBytes == null)
+                    throw new InvalidOperationException($"Could not extract data from gpu for '{model}', maybe this model isn't uploaded to the gpu yet ?");
+
+                if (verticesBytes.Length == 0 || indicesBytes.Length == 0)
+                {
+                    vertices = Array.Empty<VertexPosition3>();
+                    indices = Array.Empty<int>();
+                    return;
+                }
+
+                int vertMappingStart = vertexWriteHead;
+                fixed (byte* bytePtr = verticesBytes)
+                {
+                    var vBindings = meshData.Draw.VertexBuffers[0];
+                    int count = vBindings.Count;
+                    int stride = vBindings.Declaration.VertexStride;
+
+                    for (int i = 0, vHead = vBindings.Offset; i < count; i++, vHead += stride)
+                    {
+                        vertices[vertexWriteHead++].Position = *(Vector3*)(bytePtr + vHead);
                     }
                 }
-                else
+
+                fixed (byte* bytePtr = indicesBytes)
                 {
-                    foreach (ushort indexBufferValue in new Span<ushort>(bytePtr + meshData.Draw.IndexBuffer.Offset, count))
+                    var count = meshData.Draw.IndexBuffer.Count;
+
+                    if (meshData.Draw.IndexBuffer.Is32Bit)
                     {
-                        indices[indexWriteHead++] = vertMappingStart + indexBufferValue;
+                        foreach (int indexBufferValue in new Span<int>(bytePtr + meshData.Draw.IndexBuffer.Offset, count))
+                        {
+                            indices[indexWriteHead++] = vertMappingStart + indexBufferValue;
+                        }
+                    }
+                    else
+                    {
+                        foreach (ushort indexBufferValue in new Span<ushort>(bytePtr + meshData.Draw.IndexBuffer.Offset, count))
+                        {
+                            indices[indexWriteHead++] = vertMappingStart + indexBufferValue;
+                        }
                     }
                 }
             }
+
+
         }
     }
 

@@ -51,7 +51,8 @@ namespace Stride.BepuPhysics.DebugRender.Processors
                 _sceneSystem.GraphicsCompositor.RenderFeatures.Add(_wireframeRenderFeature);
             }
 
-            _visibilityGroup = _sceneSystem.SceneInstance.VisibilityGroups.First();
+            if (_sceneSystem.SceneInstance != null)
+                _visibilityGroup = _sceneSystem.SceneInstance.VisibilityGroups.First();
         }
 
         protected override void OnEntityComponentAdding(Entity entity, [NotNull] DebugRenderComponent component, [NotNull] DebugRenderComponent data)
@@ -156,6 +157,10 @@ namespace Stride.BepuPhysics.DebugRender.Processors
             container.Collider.GetLocalTransforms(container, transforms);
 
             WireFrameRenderObject[] wireframes = new WireFrameRenderObject[transforms.Length];
+
+            if (_visibilityGroup == null)
+                _visibilityGroup = _sceneSystem.SceneInstance.VisibilityGroups.First();
+
             for (int i = 0; i < shapeData.Count; i++)
             {
                 var data = shapeData[i];

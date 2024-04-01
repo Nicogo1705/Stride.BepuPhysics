@@ -54,9 +54,9 @@ Defaults:
             -   Enabled: true
                 ParallelUpdate: true
                 Deterministic: false
-                FixedTimeStepSeconds: 0.0166666
+                FixedTimeStepSeconds: 0.025
                 TimeScale: 1.0
-                MaxStepPerFrame: 3
+                MaxStepPerFrame: 1
                 UsePerBodyAttributes: false
                 PoseGravity: {X: 0.0, Y: -9.8, Z: 0.0}
                 PoseLinearDamping: 0.05
