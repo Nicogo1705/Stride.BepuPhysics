@@ -20,3 +20,14 @@ Check out the Docs in the [wiki](https://github.com/Nicogo1705/Stride.BepuPhysic
 8. Numerous of samples utility scripts & scenes to aid understanding how to use.
 9. INSANE performances :heart:
 10. [Wiki](https://github.com/Nicogo1705/Stride.BepuPhysics/wiki)
+
+## Star History
+
+<a href="https://star-history.com/#Nicogo1705/Stride.BepuPhysics&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Nicogo1705/Stride.BepuPhysics&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Nicogo1705/Stride.BepuPhysics&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Nicogo1705/Stride.BepuPhysics&type=Date" />
+ </picture>
+</a>
+Thanks !
