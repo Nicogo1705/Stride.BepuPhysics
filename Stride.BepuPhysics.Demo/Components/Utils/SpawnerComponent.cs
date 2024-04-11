@@ -1,7 +1,8 @@
-﻿using System;
 using Stride.Core.Mathematics;
 using Stride.Engine;
 using Stride.Input;
+using System;
+using System.Linq;
 
 namespace Stride.BepuPhysics.Demo.Components.Utils
 {
@@ -18,7 +19,7 @@ namespace Stride.BepuPhysics.Demo.Components.Utils
         public Vector3 SpawnVelocityRange { get; set; } = new(2f, 0f, 2f); //XYZ * rand[-1,1]
         public Vector3 RandomPositionRange { get; set; } = new(2f, 2f, 2f); //XYZ * rand[-1,1]
 
-
+        private const string ShapeName = "BepuCube";
         private int currentCount = 0;
         private float currentTime = 0;
 
@@ -67,9 +68,24 @@ namespace Stride.BepuPhysics.Demo.Components.Utils
             {
                 SpawnRate /= 1.1f;
             }
+            if (Input.IsKeyPressed(Keys.R))
+            {
+                currentCount = 0;
+
+                foreach (var entity in Entity.Scene.Entities.SelectMany(s => s.GetChildren()).Where(w => w.Name == ShapeName).ToList())
+                {
+                    entity.Scene = null;
+                }
+
+                foreach (var entity in Entity.Scene.Entities.Where(w => w.Name == ShapeName).ToList())
+                {
+                    entity.Scene = null;
+                }
+            }
 
             DebugText.Print($"Prefab count : {currentCount}/{Count}", new(Game.Window.PreferredWindowedSize.X - 500, 25));
-            DebugText.Print($"Spawn by Physic time : {SpawnRate} (p & m)", new(Game.Window.PreferredWindowedSize.X - 500, 50));
+            DebugText.Print($"Reset count : (R)", new(Game.Window.PreferredWindowedSize.X - 500, 50));
+            DebugText.Print($"Spawn by Physic time : {SpawnRate} (p & m)", new(Game.Window.PreferredWindowedSize.X - 500, 75));
         }
     }
 }

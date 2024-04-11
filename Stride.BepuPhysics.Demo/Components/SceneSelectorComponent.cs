@@ -1,4 +1,4 @@
-﻿using Stride.Core.Serialization;
+using Stride.Core.Serialization;
 using Stride.Engine;
 using Stride.Input;
 
@@ -33,6 +33,8 @@ namespace Stride.BepuPhysics.Demo.Components
 
         private Scene? _last { get; set; } = null;
 
+        private int _lastSceneTextY = 250;
+
         public override void Start()
         {
             DebugText.Visible = true;
@@ -42,7 +44,10 @@ namespace Stride.BepuPhysics.Demo.Components
         }
         public override void Update()
         {
-            DebugText.Print("USE NUMPAD number : (Hold 'n' for more)", new(800, 10));
+            DebugText.Print("USE NUMPAD number : (Hold 'n' for more)", new(5, 35));
+
+            DebugText.Print("Mesh Debug Toggle: (F11)", new(1100, 100));
+
             var shift = Input.IsKeyDown(Keys.N);
 
             for (int i = 0; i < 10; i++)
@@ -51,7 +56,7 @@ namespace Stride.BepuPhysics.Demo.Components
                 if (sceneRef == null)
                     continue;
 
-                DebugText.Print($"{i} => {sceneRef.Url}", new(800, 5 + (i + 1) * 25));
+                DebugText.Print($"{i} => {sceneRef.Url}", new(5, 35 + (shift ? _lastSceneTextY : 0) + (i + 1) * 25));
 
                 if (Input.IsKeyPressed(Keys.NumPad0 + i) || Input.IsKeyPressed(Keys.D0 + i))
                 {
