@@ -16,7 +16,7 @@ public class ContainerProcessor : EntityProcessor<ContainerComponent>
     internal readonly UnsortedO1List<StaticComponent, Matrix4x4> Statics = new();
 
     internal ShapeCacheSystem ShapeCache { get; private set; } = null!;
-    internal Dictionary<ContainerComponent, ContainerComponent>.Enumerator ComponentDataEnumerator => base.ComponentDatas.GetEnumerator();
+    public Dictionary<ContainerComponent, ContainerComponent>.Enumerator ComponentDataEnumerator => base.ComponentDatas.GetEnumerator();
 
     public BepuConfiguration BepuConfiguration { get; private set; } = null!;
 
