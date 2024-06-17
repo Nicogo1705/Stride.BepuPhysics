@@ -16,8 +16,8 @@ public abstract class SimulationUpdateComponent : SyncScript, ISimulationUpdate
         {
             if (_simulationIndex != value)
             {
-				if (_started)
-					Cancel();
+                if (_started)
+                    Cancel();
                 _simulationIndex = value;
                 if (_started)
                     Start();
