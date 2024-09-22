@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Stride.Engine" Version="4.2.0.2122" />
+    <PackageReference Include="Stride.Engine" Version="4.2.0.2230" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Stride.BepuPhysics\Stride.BepuPhysics.csproj" />

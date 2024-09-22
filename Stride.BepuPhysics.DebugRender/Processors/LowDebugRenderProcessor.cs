@@ -187,11 +187,22 @@ namespace Stride.BepuPhysics.DebugRender.Processors
                     var compound = _sim.Simulation.Shapes.GetShape<Compound>(shapeIndex);
                     shapes.AddRange(GetCompoundData(compound));
                     break;
-                //case 7:
-                //throw new NotImplementedException("BigCompounds are not implemented.");
+                case 7:
+                    var bigCompound = _sim.Simulation.Shapes.GetShape<BigCompound>(shapeIndex);
+                    //shapes.AddRange(GetCompoundData(bigCompound));
+#warning TODO
+                    break;
                 case 8:
                     var mesh = _sim.Simulation.Shapes.GetShape<cMesh>(shapeIndex);
-                    //shapes.Add(GetMeshData(mesh, toLeftHanded));
+                    var vertices = new VertexPosition3[mesh.Triangles.Length *3];
+                    for (int i = 0; i < mesh.Triangles.Length; i++)
+                    {
+                        vertices[i * 3] = (new VertexPosition3(mesh.Triangles[i].A.ToStrideVector()));
+                        vertices[i * 3 + 1] = (new VertexPosition3(mesh.Triangles[i].B.ToStrideVector()));
+                        vertices[i * 3 + 2] = (new VertexPosition3(mesh.Triangles[i].C.ToStrideVector()));
+                    }
+
+                    shapeData = new BasicMeshBuffers() { Vertices = vertices.ToArray(), Indices = Enumerable.Range(0, vertices.Length).ToArray() };
                     break;
             }
 

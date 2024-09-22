@@ -176,7 +176,7 @@ internal class ShapeCacheSystem
         {
             if (meshData.Draw.PrimitiveType == PrimitiveType.TriangleList && meshData.Draw.IndexBuffer == null)
             {
-                totalIndices += meshData.Draw.VertexBuffers[0].Count;
+                totalIndices += meshData.Draw.DrawCount;
             }
             else
             {
