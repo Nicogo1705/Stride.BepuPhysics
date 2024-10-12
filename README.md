@@ -1,4 +1,6 @@
-# Bepu Physics V2 Integration with Stride 3D - Work in Progress
+# Bepu Physics V2 Integration with Stride 3D - [Stride PR](https://github.com/stride3d/stride/pull/2131)
+
+/!\ Warning, this repos will not get any updates, instead, look at the [PR on the stride repos](https://github.com/stride3d/stride/pull/2131).
 
 ## Informations 
 
